@@ -10,6 +10,7 @@ enum class OpCode: std::uint8_t {
     Div = 0x04,
     Shl = 0x05,
     Shr = 0x06,
+    
     Load = 0x07,
     Memg = 0x08,
     Mems = 0x09,

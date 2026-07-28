@@ -14,8 +14,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(minifb)
 
-file(GLOB_RECURSE SOURCES
-    ${CMAKE_SOURCE_DIR}/src/*.cpp
+set(SOURCES
+    ./src/main.cpp
+    ./src/cpu.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -27,3 +28,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE minifb)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    $<$<CONFIG:Debug>:EMU_DEBUG>
+)

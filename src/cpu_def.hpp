@@ -26,4 +26,4 @@ enum Register : uint8_t {
         RA = 17,
         FLAGS = 18,
         PC = 19
-    };
+};

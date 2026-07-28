@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <iostream>
 #include <vector>
+#include "debug.h"
 
 class Memory {
     private:
@@ -13,12 +14,12 @@ class Memory {
     public:
 
     void set(uint32_t addr, uint8_t value) {
-        if (addr >= size || addr < 0) std::cerr << "Bad Address writted, ignored" << "\n"; return;
+        DEBUG_CHECK(addr >= size || addr < 0, "Bad Address writted, ignored");
         data[addr] = value;
     }
 
     uint8_t get(uint32_t addr) {
-        if (addr >= size || addr < 0) std::cerr << "Bad Address readed, ignored" << "\n"; return 0;
+        DEBUG_CHECK(addr >= size || addr < 0, "Bad Address readed, ignored");
         return data[addr];
     }
     

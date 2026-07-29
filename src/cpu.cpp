@@ -94,15 +94,33 @@ void CPU::mems(uint8_t addr, uint8_t value) {
     mem->set(addr_val, val);
 }
 
+void CPU::memgw(uint8_t target, uint8_t addr) {
+    const uint32_t addr_val = get_reg(addr);
+
+    uint8_t val[4];
+    mem->get_slice4(addr_val,val);
+    set_reg(target, little_endian_to_u32(val));
+}
+
+void CPU::memsw(uint8_t addr, uint8_t value) {
+    const uint32_t addr_val = get_reg(addr);
+    uint8_t val[4];
+    u32_to_little_endian(get_reg(value), val);
+    mem->set(addr_val, val[0]);
+    mem->set(addr_val + 1, val[1]);
+    mem->set(addr_val + 2, val[2]);
+    mem->set(addr_val + 3, val[3]);
+}
+
 
 void CPU::comp(uint8_t r1, uint8_t r2) {
     const uint32_t r1_val = get_reg(r1);
     const uint32_t r2_val = get_reg(r2);
 
-    if(r1_val == r2_val) set_flag(FlagStates::Equal); return;
-    if(r1_val != r2_val) set_flag(FlagStates::Different); return;
-    if(r1_val > r2_val) set_flag(FlagStates::Superior); return;
-    if(r1_val < r2_val) set_flag(FlagStates::Inferior); return;
+    if(r1_val == r2_val) {set_flag(FlagStates::Equal); return;}
+    if(r1_val != r2_val) {set_flag(FlagStates::Different); return;}
+    if(r1_val > r2_val) {set_flag(FlagStates::Superior); return;}
+    if(r1_val < r2_val) {set_flag(FlagStates::Inferior); return; }
 }
 
 void CPU::jump(uint32_t addr) {
@@ -129,22 +147,39 @@ void CPU::jump_reg(uint8_t r1) {
     set_pc(get_reg(r1));
 }
 
-void CPU::jeq_reg(uint8_t r1) {
+void CPU::JeqReg(uint8_t r1) {
     if (get_flag() == FlagStates::Equal) set_pc(get_reg(r1));
 }
 
-void CPU::jneq_reg(uint8_t r1) {
+void CPU::JneqReg(uint8_t r1) {
     if (get_flag() == FlagStates::Different) set_pc(get_reg(r1));
 }
 
 
-void CPU::jsup_reg(uint8_t r1) {
+void CPU::JsupReg(uint8_t r1) {
     if (get_flag() == FlagStates::Superior) set_pc(get_reg(r1));
 }
 
 
-void CPU::jinf_reg(uint8_t r1) {
+void CPU::JinfReg(uint8_t r1) {
     if (get_flag() == FlagStates::Inferior) set_pc(get_reg(r1));
+}
+
+void CPU::call(uint32_t addr) {
+    call_stack.push(regs[Register::PC] + 8);
+    set_pc(addr - 8);
+}
+
+void CPU::call_reg(uint8_t addr) {
+    uint32_t addr_val = get_reg(addr);
+    call_stack.push(regs[Register::PC] + 8);
+    set_pc(addr_val - 8);
+}
+
+void CPU::ret() {
+    DEBUG_CHECK(call_stack.empty(), "Call stack underflow");
+    set_pc(call_stack.top() - 8);
+    call_stack.pop();
 }
 
 
@@ -192,6 +227,12 @@ void CPU::exec(const uint8_t instr[8]) {
         case OpCode::Mems:
             mems(arg1, arg2);
             break;
+        case OpCode::Memgw:
+            memgw(arg1, arg2);
+            break;
+        case OpCode::Memsw:
+            memsw(arg1, arg2);
+            break;
         case OpCode::Comp:
             comp(arg1, arg2);
             break;
@@ -213,17 +254,26 @@ void CPU::exec(const uint8_t instr[8]) {
         case OpCode::Jreg:
             jump_reg(arg1);
             break;
-        case OpCode::Jeq_reg:
-            jeq_reg(arg1);
+        case OpCode::JeqReg:
+            JeqReg(arg1);
             break;
-        case OpCode::Jneq_reg:
-            jneq_reg(arg1);
+        case OpCode::JneqReg:
+            JneqReg(arg1);
             break;
-        case OpCode::Jsup_reg:
-            jsup_reg(arg1);
+        case OpCode::JsupReg:
+            JsupReg(arg1);
             break;
-        case OpCode::Jinf_reg:
-            jinf_reg(arg1);
+        case OpCode::JinfReg:
+            JinfReg(arg1);
+            break;
+        case OpCode::Call:
+            call(imm_value);
+            break;
+        case OpCode::CallReg:
+            call_reg(arg1);
+            break;
+        case OpCode::Ret:
+            ret();
             break;
         case OpCode::Halt:
             running = false;
@@ -234,9 +284,21 @@ void CPU::exec(const uint8_t instr[8]) {
     return;
 }
 
+void CPU::run(uint32_t start_addr) {
+    running = true;
+    set_pc(start_addr);
 
+    while (running && get_pc() < mem->get_size()) {
+        uint8_t code[8];
+        mem->get_slice8(get_pc(), code);
+        exec(code);
+
+        regs[Register::PC] += 8;
+    }
+}
 
 
 CPU::CPU(Memory *mem): mem(mem) {
     regs[Register::FLAGS] = FlagStates::None;
+    
 }

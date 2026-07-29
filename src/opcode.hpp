@@ -22,19 +22,27 @@ enum OpCode: std::uint8_t {
 
     Memg = 0x0C,
     Mems = 0x0D,
+    Memgw = 0x0E,
+    Memsw = 0x0F,
 
-    Comp = 0x0E,
-    Jump = 0x0F,
-    Jeq = 0x10,
-    Jneq = 0x11,
-    Jsup = 0x12,
-    Jinf = 0x13,
+    Comp = 0x10,
+    Jump = 0x11,
+    Jeq = 0x12,
+    Jneq = 0x13,
+    Jsup = 0x14,
+    Jinf = 0x15,
 
-    Jreg = 0x14,
-    Jeq_reg = 0x15,
-    Jneq_reg = 0x16,
-    Jsup_reg = 0x17,
-    Jinf_reg = 0x18,
+    Jreg = 0x16,
+    JeqReg = 0x17,
+    JneqReg = 0x18,
+    JsupReg = 0x19,
+    JinfReg = 0x1A,
+
+    Copy = 0x1B,
+
+    Call = 0x1C,
+    CallReg = 0x1D,
+    Ret = 0x1E,
 
     Halt = 0xFF,
 };

@@ -1,9 +1,11 @@
 #pragma once
 
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <vector>
 #include "debug.h"
+#include <array>
 
 class Memory {
     private:
@@ -12,6 +14,33 @@ class Memory {
     uint32_t size;
 
     public:
+    uint32_t get_size() {return size;}
+
+    uint32_t add_instr(uint32_t addr, uint8_t opcode,
+                        uint8_t op0 = 0, uint8_t op1 = 0, uint8_t op2 = 0,
+                        uint8_t op3 = 0, uint8_t op4 = 0, uint8_t op5 = 0,
+                        uint8_t op6 = 0) {
+        set(addr,     opcode);
+        set(addr + 1, op0);
+        set(addr + 2, op1);
+        set(addr + 3, op2);
+        set(addr + 4, op3);
+        set(addr + 5, op4);
+        set(addr + 6, op5);
+        set(addr + 7, op6);
+
+        return addr + 8;
+    }
+
+    void get_slice8(uint32_t offset, uint8_t out[8]) {
+        DEBUG_CHECK(offset > size - 8, "Bad Address readed, ignored");
+        std::memcpy(out, data.data() + offset, 8);
+    }
+
+    void get_slice4(uint32_t offset, uint8_t out[4]) {
+        DEBUG_CHECK(offset > size - 4, "Bad Address readed, ignored");
+        std::memcpy(out, data.data() + offset, 4);
+    }
 
     void set(uint32_t addr, uint8_t value) {
         DEBUG_CHECK(addr >= size, "Bad Address writted, ignored");

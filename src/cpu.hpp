@@ -3,13 +3,14 @@
 #include <cstdint>
 #include "cpu_def.hpp"
 #include "memory.hpp"
-
+#include <stack>
 
 class CPU {
 private:
     Memory *mem;
     uint32_t regs[REGISTER_COUNT] = {0};
     bool running = false;
+    std::stack<uint32_t> call_stack;
 public:
     uint32_t get_reg(uint8_t index);
     void set_reg(uint8_t index, uint32_t value);
@@ -35,8 +36,11 @@ public:
     void shr(uint8_t target, uint8_t r1, uint8_t r2);
 
     void load(uint8_t target, uint32_t value);
+
     void memg(uint8_t target, uint8_t addr);
     void mems(uint8_t addr, uint8_t value);
+    void memgw(uint8_t target, uint8_t addr);
+    void memsw(uint8_t addr, uint8_t value);
 
     void comp(uint8_t r1, uint8_t r2);
     void jump(uint32_t addr);
@@ -45,12 +49,17 @@ public:
     void jsup(uint32_t addr);
     void jinf(uint32_t addr);
     void jump_reg(uint8_t r1);
-    void jeq_reg(uint8_t r1);
-    void jneq_reg(uint8_t r1);
-    void jsup_reg(uint8_t r1);
-    void jinf_reg(uint8_t r1);
+    void JeqReg(uint8_t r1);
+    void JneqReg(uint8_t r1);
+    void JsupReg(uint8_t r1);
+    void JinfReg(uint8_t r1);
+
+    void call(uint32_t addr);
+    void call_reg(uint8_t addr);
+    void ret();
 
     void exec(const uint8_t instr[8]);
+    void run(uint32_t start_addr = 0);
 
     CPU(Memory *mem);
     ~CPU() = default;

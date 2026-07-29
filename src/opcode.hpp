@@ -4,16 +4,37 @@
 
 enum OpCode: std::uint8_t {
     Nop = 0x00,
+
     Add = 0x01,
     Sub = 0x02,
     Mul = 0x03,
     Div = 0x04,
-    Shl = 0x05,
-    Shr = 0x06,
 
-    Load = 0x07,    
-    Memg = 0x08,
-    Mems = 0x09,
-    //Add = 0x0A,
+    And = 0x05,
+    Or  = 0x06,
+    Xor = 0x07,
+    Not = 0x08,
+
+    Shl = 0x09,
+    Shr = 0x0A,
+
+    Load = 0x0B,
+
+    Memg = 0x0C,
+    Mems = 0x0D,
+
+    Comp = 0x0E,
+    Jump = 0x0F,
+    Jeq = 0x10,
+    Jneq = 0x11,
+    Jsup = 0x12,
+    Jinf = 0x13,
+
+    Jreg = 0x14,
+    Jeq_reg = 0x15,
+    Jneq_reg = 0x16,
+    Jsup_reg = 0x17,
+    Jinf_reg = 0x18,
+
     Halt = 0xFF,
 };

@@ -27,3 +27,12 @@ enum Register : uint8_t {
         FLAGS = 18,
         PC = 19
 };
+
+enum FlagStates: uint8_t {
+    None = 0x00,
+    Equal = 0x01,
+    Different = 0x02,
+    Superior = 0x03,
+    Inferior = 0x04
+};
+

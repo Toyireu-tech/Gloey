@@ -14,12 +14,12 @@ class Memory {
     public:
 
     void set(uint32_t addr, uint8_t value) {
-        DEBUG_CHECK(addr >= size || addr < 0, "Bad Address writted, ignored");
+        DEBUG_CHECK(addr >= size, "Bad Address writted, ignored");
         data[addr] = value;
     }
 
     uint8_t get(uint32_t addr) {
-        DEBUG_CHECK(addr >= size || addr < 0, "Bad Address readed, ignored");
+        DEBUG_CHECK(addr >= size, "Bad Address readed, ignored");
         return data[addr];
     }
     

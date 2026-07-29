@@ -23,8 +23,10 @@ public:
     void shr(uint8_t target, uint8_t r1, uint8_t r2);
 
     void load(uint8_t target, uint32_t value);
-    uint32_t memg(uint8_t addr);
+    void memg(uint8_t target, uint8_t addr);
     void mems(uint8_t addr, uint8_t value);
+
+    void exec(const uint8_t instr[8]);
 
     CPU(Memory *mem);
     ~CPU() = default;

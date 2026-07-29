@@ -165,6 +165,10 @@ void CPU::JinfReg(uint8_t r1) {
     if (get_flag() == FlagStates::Inferior) set_pc(get_reg(r1));
 }
 
+void CPU::copy(uint8_t target, uint8_t src) {
+    set_reg(target, get_reg(src));
+}
+
 void CPU::call(uint32_t addr) {
     call_stack.push(regs[Register::PC] + 8);
     set_pc(addr - 8);
@@ -265,6 +269,9 @@ void CPU::exec(const uint8_t instr[8]) {
             break;
         case OpCode::JinfReg:
             JinfReg(arg1);
+            break;
+        case OpCode::Copy:
+            copy(arg1, arg2);
             break;
         case OpCode::Call:
             call(imm_value);

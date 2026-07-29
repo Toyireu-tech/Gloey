@@ -4,6 +4,7 @@
 #include "cpu_def.hpp"
 #include "memory.hpp"
 #include <stack>
+#include <sys/types.h>
 
 class CPU {
 private:
@@ -53,6 +54,8 @@ public:
     void JneqReg(uint8_t r1);
     void JsupReg(uint8_t r1);
     void JinfReg(uint8_t r1);
+
+    void copy(uint8_t target, uint8_t src);
 
     void call(uint32_t addr);
     void call_reg(uint8_t addr);

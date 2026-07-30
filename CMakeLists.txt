@@ -15,8 +15,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(minifb)
 
 set(SOURCES
-    ./src/main.cpp
-    ./src/cpu.cpp
+    src/main.cpp
+    src/cpu.cpp
+    src/assembler.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -29,6 +30,3 @@ target_link_libraries(${PROJECT_NAME} PRIVATE minifb)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-    $<$<CONFIG:Debug>:EMU_DEBUG>
-)

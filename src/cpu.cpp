@@ -3,7 +3,6 @@
 #include "memory.hpp"
 #include <cstdint>
 #include <cstring>
-#include <string>
 
 #include "debug.h"
 #include "opcode.hpp"
@@ -117,52 +116,52 @@ void CPU::comp(uint8_t r1, uint8_t r2) {
     const uint32_t r1_val = get_reg(r1);
     const uint32_t r2_val = get_reg(r2);
 
-    if(r1_val == r2_val) {set_flag(FlagStates::Equal); return;}
-    if(r1_val != r2_val) {set_flag(FlagStates::Different); return;}
-    if(r1_val > r2_val) {set_flag(FlagStates::Superior); return;}
-    if(r1_val < r2_val) {set_flag(FlagStates::Inferior); return; }
+    if (r1_val == r2_val) set_flag(FlagStates::Equal);
+    else if (r1_val > r2_val) set_flag(FlagStates::Superior);
+    else set_flag(FlagStates::Inferior);
 }
 
 void CPU::jump(uint32_t addr) {
-    set_pc(addr);
+    set_pc(addr - 8);
+    //std::cout << addr;
 }
 
 void CPU::jeq(uint32_t addr)  {
-    if (get_flag() == FlagStates::Equal) set_pc(addr);
+    if (get_flag() == FlagStates::Equal) set_pc(addr - 8);
 }
 
 void CPU::jneq(uint32_t addr) {
-    if (get_flag() == FlagStates::Different) set_pc(addr);
+    if (get_flag() != FlagStates::Equal) set_pc(addr - 8);
 }
 
 void CPU::jsup(uint32_t addr) {
-    if (get_flag() == FlagStates::Superior) set_pc(addr);
+    if (get_flag() == FlagStates::Superior) set_pc(addr - 8);
 }
 
 void CPU::jinf(uint32_t addr) {
-    if (get_flag() == FlagStates::Inferior) set_pc(addr);
+    if (get_flag() == FlagStates::Inferior) set_pc(addr - 8);
 }
 
 void CPU::jump_reg(uint8_t r1) {
-    set_pc(get_reg(r1));
+    set_pc(get_reg(r1) - 8);
 }
 
 void CPU::JeqReg(uint8_t r1) {
-    if (get_flag() == FlagStates::Equal) set_pc(get_reg(r1));
+    if (get_flag() == FlagStates::Equal) set_pc(get_reg(r1) - 8);
 }
 
 void CPU::JneqReg(uint8_t r1) {
-    if (get_flag() == FlagStates::Different) set_pc(get_reg(r1));
+    if (get_flag() != FlagStates::Equal) set_pc(get_reg(r1) - 8);
 }
 
 
 void CPU::JsupReg(uint8_t r1) {
-    if (get_flag() == FlagStates::Superior) set_pc(get_reg(r1));
+    if (get_flag() == FlagStates::Superior) set_pc(get_reg(r1) - 8);
 }
 
 
 void CPU::JinfReg(uint8_t r1) {
-    if (get_flag() == FlagStates::Inferior) set_pc(get_reg(r1));
+    if (get_flag() == FlagStates::Inferior) set_pc(get_reg(r1) - 8);
 }
 
 void CPU::copy(uint8_t target, uint8_t src) {

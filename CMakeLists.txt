@@ -30,3 +30,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE minifb)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
 
+set(CMAKE_CXX_FLAGS "-O3 -march=native -flto")

@@ -32,14 +32,16 @@ class Memory {
         return addr + 8;
     }
 
-    void get_slice8(uint32_t offset, uint8_t out[8]) {
+    const uint8_t* get_slice8(uint32_t offset) const
+    {
         DEBUG_CHECK(offset > size - 8, "Bad Address readed, ignored");
-        std::memcpy(out, data.data() + offset, 8);
+        return data.data() + offset;
     }
 
-    void get_slice4(uint32_t offset, uint8_t out[4]) {
+    const uint8_t* get_slice4(uint32_t offset) const
+    {
         DEBUG_CHECK(offset > size - 4, "Bad Address readed, ignored");
-        std::memcpy(out, data.data() + offset, 4);
+        return data.data() + offset;
     }
 
     void set(uint32_t addr, uint8_t value) {

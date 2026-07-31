@@ -96,8 +96,7 @@ void CPU::mems(uint8_t addr, uint8_t value) {
 void CPU::memgw(uint8_t target, uint8_t addr) {
     const uint32_t addr_val = get_reg(addr);
 
-    uint8_t val[4];
-    mem->get_slice4(addr_val,val);
+    const uint8_t* val = mem->get_slice4(addr_val);
     set_reg(target, little_endian_to_u32(val));
 }
 
@@ -195,8 +194,7 @@ void CPU::exec(const uint8_t instr[8]) {
     const uint8_t arg3 = instr[3];
     const uint8_t arg4 = instr[4]; // only used for 4 arguments instructiions like div
 
-    uint8_t imm[4] = {0};
-    std::memcpy(imm, instr + 4, 4);
+    const uint8_t *imm = instr + 4;
 
     uint32_t imm_value = little_endian_to_u32(imm);
 
@@ -295,8 +293,7 @@ void CPU::run(uint32_t start_addr) {
     set_pc(start_addr);
 
     while (running && get_pc() < mem->get_size()) {
-        uint8_t code[8];
-        mem->get_slice8(get_pc(), code);
+        const uint8_t* code = mem->get_slice8(get_pc());
         exec(code);
 
         regs[Register::PC] += 8;

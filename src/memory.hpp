@@ -10,11 +10,13 @@
 class Memory {
     private:
 
-    std::vector<uint8_t> data;
+    
     uint32_t size;
 
     public:
+    std::vector<uint8_t> data; 
     uint32_t get_size() {return size;}
+    auto get_data() {return &data;}
 
     uint32_t add_instr(uint32_t addr, uint8_t opcode,
                         uint8_t op0 = 0, uint8_t op1 = 0, uint8_t op2 = 0,

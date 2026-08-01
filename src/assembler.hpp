@@ -13,50 +13,68 @@ namespace Assembler {
     static std::unordered_map<std::string, uint32_t> sections;
 
     static const std::unordered_map<std::string, uint8_t> mnemonics = {
-        {"nop",      OpCode::Nop},
+    {"nop",      OpCode::Nop},
 
-        {"add",      OpCode::Add},
-        {"sub",      OpCode::Sub},
-        {"mul",      OpCode::Mul},
-        {"div",      OpCode::Div},
+    {"add",      OpCode::Add},
+    {"sub",      OpCode::Sub},
+    {"mul",      OpCode::Mul},
+    {"div",      OpCode::Div},
 
-        {"and",      OpCode::And},
-        {"or",       OpCode::Or},
-        {"xor",      OpCode::Xor},
-        {"not",      OpCode::Not},
+    {"addi",     OpCode::Addi},
+    {"subi",     OpCode::Subi},
+    {"muli",     OpCode::Muli},
+    {"divi",     OpCode::Divi},
 
-        {"shl",      OpCode::Shl},
-        {"shr",      OpCode::Shr},
+    {"and",      OpCode::And},
+    {"or",       OpCode::Or},
+    {"xor",      OpCode::Xor},
+    {"not",      OpCode::Not},
 
-        {"load",     OpCode::Load},
+    {"andi",     OpCode::Andi},
+    {"ori",      OpCode::Ori},
+    {"xori",     OpCode::Xori},
 
-        {"memg",     OpCode::Memg},
-        {"mems",     OpCode::Mems},
-        {"memgw",    OpCode::Memgw},
-        {"memsw",    OpCode::Memsw},
+    {"shl",      OpCode::Shl},
+    {"shr",      OpCode::Shr},
 
-        {"comp",     OpCode::Comp},
+    {"shli",     OpCode::Shli},
+    {"shri",     OpCode::Shri},
 
-        {"jump",     OpCode::Jump},
-        {"jeq",      OpCode::Jeq},
-        {"jneq",     OpCode::Jneq},
-        {"jsup",     OpCode::Jsup},
-        {"jinf",     OpCode::Jinf},
+    {"load",     OpCode::Load},
 
-        {"jreg",     OpCode::Jreg},
-        {"jeqreg",   OpCode::JeqReg},
-        {"jneqreg",  OpCode::JneqReg},
-        {"jsupreg",  OpCode::JsupReg},
-        {"jinfreg",  OpCode::JinfReg},
+    {"memg",     OpCode::Memg},
+    {"mems",     OpCode::Mems},
+    {"memgw",    OpCode::Memgw},
+    {"memsw",    OpCode::Memsw},
 
-        {"copy",     OpCode::Copy},
+    {"memgi",    OpCode::Memgi},
+    {"memsi",    OpCode::Memsi},
+    {"memgwi",   OpCode::Memgwi},
+    {"memswi",   OpCode::Memswi},
 
-        {"call",     OpCode::Call},
-        {"callreg",  OpCode::CallReg},
-        {"ret",      OpCode::Ret},
+    {"comp",     OpCode::Comp},
+    {"compi",    OpCode::Compi},
 
-        {"halt",     OpCode::Halt},
-    };
+    {"jump",     OpCode::Jump},
+    {"jeq",      OpCode::Jeq},
+    {"jneq",     OpCode::Jneq},
+    {"jsup",     OpCode::Jsup},
+    {"jinf",     OpCode::Jinf},
+
+    {"jreg",     OpCode::Jreg},
+    {"jeqreg",   OpCode::JeqReg},
+    {"jneqreg",  OpCode::JneqReg},
+    {"jsupreg",  OpCode::JsupReg},
+    {"jinfreg",  OpCode::JinfReg},
+
+    {"copy",     OpCode::Copy},
+
+    {"call",     OpCode::Call},
+    {"callreg",  OpCode::CallReg},
+    {"ret",      OpCode::Ret},
+
+    {"halt",     OpCode::Halt},
+};
 
     bool is_valid_line(const std::string& line);
     std::vector<std::string> tokenize(const std::string& line);

@@ -44,5 +44,25 @@ enum OpCode: std::uint8_t {
     CallReg = 0x1D,
     Ret = 0x1E,
 
+
+    
+    Addi = 0x1F,
+    Subi = 0x20,
+    Muli = 0x21,
+    Divi = 0x22,
+
+    Andi = 0x23,
+    Ori  = 0x24,
+    Xori = 0x25,
+    Compi = 0x26,
+
+    Shli = 0x27,
+    Shri = 0x28,
+
+    Memgi = 0x29,
+    Memsi = 0x2A,
+    Memgwi = 0x2B,
+    Memswi = 0x2C,
+
     Halt = 0xFF,
 };

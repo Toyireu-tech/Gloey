@@ -61,6 +61,18 @@ public:
     void call_reg(uint8_t addr);
     void ret();
 
+    void addi(uint8_t target, uint8_t r1, uint32_t imm_v);
+    void subi(uint8_t target, uint8_t r1, uint32_t imm_v);
+    void multi(uint8_t target, uint8_t r1, uint32_t imm_v);
+
+    void _andi(uint8_t target, uint8_t r1, uint32_t imm_v);
+    void _ori(uint8_t target, uint8_t r1, uint32_t imm_v);
+    void _xori(uint8_t target, uint8_t r1, uint32_t imm_v);
+    void compi(uint8_t r1, uint32_t imm_v);
+
+    void shli(uint8_t target, uint8_t r1, uint32_t imm_v);
+    void shri(uint8_t target, uint8_t r1, uint32_t imm_v);
+
     void exec(const uint8_t instr[8]);
     void run(uint32_t start_addr = 0);
 

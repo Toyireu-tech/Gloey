@@ -122,7 +122,6 @@ void CPU::comp(uint8_t r1, uint8_t r2) {
 
 void CPU::jump(uint32_t addr) {
     set_pc(addr - 8);
-    //std::cout << addr;
 }
 
 void CPU::jeq(uint32_t addr)  {
@@ -182,6 +181,57 @@ void CPU::ret() {
     DEBUG_CHECK(call_stack.empty(), "Call stack underflow");
     set_pc(call_stack.top() - 8);
     call_stack.pop();
+}
+   
+
+
+
+void CPU::addi(uint8_t target, uint8_t r1, uint32_t imm_v) {
+    const uint32_t a = get_reg(r1);
+    set_reg(target, a + imm_v);
+}
+
+void CPU::subi(uint8_t target, uint8_t r1, uint32_t imm_v) {
+    const uint32_t a = get_reg(r1);
+    set_reg(target, a - imm_v);
+}
+
+void CPU::multi(uint8_t target, uint8_t r1, uint32_t imm_v) {
+    const uint32_t a = get_reg(r1);
+    set_reg(target, a * imm_v);
+}
+
+void CPU::_andi(uint8_t target, uint8_t r1, uint32_t imm_v) {
+    const uint32_t a = get_reg(r1);
+    set_reg(target, a & imm_v);
+}
+
+void CPU::_ori(uint8_t target, uint8_t r1, uint32_t imm_v) {
+    const uint32_t a = get_reg(r1);
+    set_reg(target, a | imm_v);
+}
+
+void CPU::_xori(uint8_t target, uint8_t r1, uint32_t imm_v) {
+    const uint32_t a = get_reg(r1);
+    set_reg(target, a ^ imm_v);
+}
+
+void CPU::compi(uint8_t r1, uint32_t imm_v) {
+    const uint32_t r1_val = get_reg(r1);
+
+    if (r1_val == imm_v) set_flag(FlagStates::Equal);
+    else if (r1_val > imm_v) set_flag(FlagStates::Superior);
+    else set_flag(FlagStates::Inferior);
+}
+
+void CPU::shli(uint8_t target, uint8_t r1, uint32_t imm_v) {
+    const uint32_t a = get_reg(r1);
+    set_reg(target, a << imm_v);
+}
+
+void CPU::shri(uint8_t target, uint8_t r1, uint32_t imm_v) {
+    const uint32_t a = get_reg(r1);
+    set_reg(target, a >> imm_v);
 }
 
 
@@ -278,6 +328,33 @@ void CPU::exec(const uint8_t instr[8]) {
             break;
         case OpCode::Ret:
             ret();
+            break;
+        case OpCode::Addi:
+            addi(arg1, arg2, imm_value);
+            break;
+        case OpCode::Subi:
+            subi(arg1, arg2, imm_value);
+            break;
+        case OpCode::Muli:
+            multi(arg1, arg2, imm_value);
+            break;
+        case OpCode::Andi:
+            _andi(arg1, arg2, imm_value);
+            break;
+        case OpCode::Ori:
+            _ori(arg1, arg2, imm_value);
+            break;
+        case OpCode::Xori:
+            _xori(arg1, arg2, imm_value);
+            break;
+        case OpCode::Compi:
+            compi(arg1, imm_value);
+            break;
+        case OpCode::Shli:
+            addi(arg1, arg2, imm_value);
+            break;
+        case OpCode::Shri:
+            addi(arg1, arg2, imm_value);
             break;
         case OpCode::Halt:
             running = false;

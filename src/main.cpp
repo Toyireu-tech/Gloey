@@ -1,75 +1,31 @@
 #include "cpu.hpp"
 #include "display.hpp"
 #include "memory.hpp"
+#include <fstream>
+#include <ios>
 #include <iostream>
-#include "assembler.hpp"
 #include <chrono>
+#include <stdexcept>
 #include <thread>
 
-using namespace Assembler;
-
-
-/*
-jump _start
-
-; r6 a, r7 b, r8 tmp, r1 lim, r10 incrr base, r11 a+b
-
-.section fib
-    load r7 1
-
-    .label fib_loop
-
-        add r11 r6 r7
-        copy r6 r7
-        copy r7 r11
-
-        addi r10 r10 1
-        comp r10 r1
-        jneq fib_loop
-    copy r0 r6
-    ret
-
-.label _start
-    load r1 1
-    call fib
-halt*/
-
-int main() {
-    // test
+int main(int argc, const char** argv) {
+    if (argc < 2) throw std::runtime_error("Invalid command");
     Memory mem(1024);
     Display screen(800, 600);
     CPU cpu(&mem, &screen);
 
-    std::string program = 
-R"(      
-jump _start
+    std::ifstream input_file(argv[1], std::ios::binary | std::ios::ate);
+    if (!input_file.is_open()) throw std::runtime_error("Couldnt open file ");
 
-; r6 a, r7 b, r8 tmp, r1 lim, r10 incrr base, r11 a+b
+    std::streamsize size = input_file.tellg();
+    input_file.seekg(0, std::ios::beg);
 
-.section fib
-    load r7 1
-
-    .label fib_loop
-
-        add r11 r6 r7
-        copy r6 r7
-        copy r7 r11
-
-        addi r10 r10 1
-        comp r10 r1
-        jneq fib_loop
-    copy r0 r6
-    ret
-
-.label _start
-    load r1 10
-    call fib
-halt
-)";
+    std::vector<char> buffer(size);
+    input_file.read(buffer.data(), size);
 
     int p = 0;
-    for (auto i : assemble(program)) {
-       //std::cout << std::to_string(i) << std::endl;
+    for (auto i : buffer) {
+        //std::cout << std::to_string(i);
         mem.set(p, i);
         p++;
     }
@@ -89,6 +45,5 @@ halt
     cpu.running = false;
     cpuThread.join();    
     
-
     return 0;
 }

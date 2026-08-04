@@ -1,5 +1,6 @@
 // display.cpp
 #include "display.hpp"
+#include "MiniFB_enums.h"
 #include <stdexcept>
 
 Display::Display(uint32_t w, uint32_t h) : width(w), height(h), buffer(w * h, 0) {
@@ -21,5 +22,5 @@ void Display::setPixel(uint32_t x, uint32_t y, uint32_t color) {
 
 bool Display::update() {
     mfb_update_state state = mfb_update_ex(window, buffer.data(), width, height);
-    return state == STATE_OK;
+    return state == MFB_STATE_OK;
 }

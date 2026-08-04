@@ -1,10 +1,16 @@
 #include "assembler.hpp"
 #include <cstdint>
+#include <ios>
+#include <stdexcept>
 #include <string>
 #include <sstream>
 #include <utility>
-#include <utils.h>
+#include "utils.hpp"
 #include <cstring>
+#include <fstream>
+#include <vector>
+
+using std::ios; 
 
 namespace Assembler {
     inline bool is_valid_line(const std::string& line)
@@ -143,5 +149,32 @@ namespace Assembler {
         }  
 
         return output;
+    }
+
+    void compile_file(const std::string& input_name, const std::string& output_name) {
+        std::string input = "";
+        std::vector<uint8_t> output;
+        std::ifstream input_file(input_name);
+        std::ofstream output_file(output_name, ios::binary | ios::trunc);
+        std::string line;
+
+        if (input_file.is_open()) {
+            while (std::getline(input_file, line)) {
+                input += line + '\n';
+            }
+        } else {
+            throw std::runtime_error("Counld not open file named \"" + input_name + "\"");
+        }
+
+        output = assemble(input);
+
+        if (output_file.is_open()) {
+            output_file.write(reinterpret_cast<const char*>(output.data()), output.size());
+        } else {
+            throw std::runtime_error("Counld not open file named \"" + output_name + "\"");
+        }
+
+        input_file.close();
+        output_file.close(); 
     }
 }

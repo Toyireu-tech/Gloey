@@ -17,7 +17,6 @@ FetchContent_MakeAvailable(minifb)
 set(SOURCES
     src/main.cpp
     src/cpu.cpp
-    src/assembler.cpp
     src/display.cpp
 )
 
@@ -30,5 +29,22 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE minifb)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+
+# ====== GASM ========
+
+set(GASM_SOURCES
+    src/assembler.cpp
+    src/gasm.cpp
+)
+
+add_executable(gasm ${GASM_SOURCES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+
+target_compile_options(gasm PRIVATE -Wall -Wextra)
+
 
 set(CMAKE_CXX_FLAGS "-O3 -march=native -flto")

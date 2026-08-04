@@ -7,7 +7,7 @@
 
 #include "debug.h"
 #include "opcode.hpp"
-#include "utils.h"
+#include "utils.hpp"
 
 uint32_t CPU::get_reg(uint8_t index) {
     DEBUG_CHECK(index >= REGISTER_COUNT, "Bad register get");

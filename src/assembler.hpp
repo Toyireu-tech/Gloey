@@ -87,4 +87,5 @@ namespace Assembler {
     std::string parseLabelDef(const std::string& line);
     std::string parseSectionDef(const std::string& line);
     std::vector<uint8_t> assemble(const std::string& src);
+    void compile_file(const std::string& input_name, const std::string& output_name);
 }

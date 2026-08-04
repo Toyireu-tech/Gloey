@@ -31,7 +31,6 @@ enum Register : uint8_t {
 enum FlagStates: uint8_t {
     None = 0x00,
     Equal = 0x01,
-    //Different = 0x02,
     Superior = 0x03,
     Inferior = 0x04
 };

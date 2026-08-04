@@ -45,7 +45,7 @@ enum OpCode: std::uint8_t {
     Ret = 0x1E,
 
 
-    
+
     Addi = 0x1F,
     Subi = 0x20,
     Muli = 0x21,
@@ -63,6 +63,8 @@ enum OpCode: std::uint8_t {
     Memsi = 0x2A,
     Memgwi = 0x2B,
     Memswi = 0x2C,
+
+    Setpix = 0x2E,
 
     Halt = 0xFF,
 };

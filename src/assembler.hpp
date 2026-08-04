@@ -11,6 +11,7 @@ namespace Assembler {
 
     static std::unordered_map<std::string, uint32_t> labels;
     static std::unordered_map<std::string, uint32_t> sections;
+    static std::unordered_map<std::string, std::string> alias;
 
     static const std::unordered_map<std::string, uint8_t> mnemonics = {
     {"nop",      OpCode::Nop},
@@ -72,6 +73,7 @@ namespace Assembler {
     {"call",     OpCode::Call},
     {"callreg",  OpCode::CallReg},
     {"ret",      OpCode::Ret},
+    {"setpix",   OpCode::Setpix},
 
     {"halt",     OpCode::Halt},
 };

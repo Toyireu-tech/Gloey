@@ -5,14 +5,17 @@
 #include "memory.hpp"
 #include <stack>
 #include <sys/types.h>
+#include "display.hpp"
 
 class CPU {
 private:
     Memory *mem;
     uint32_t regs[REGISTER_COUNT] = {0};
-    bool running = false;
+    Display *display;
+    
     std::stack<uint32_t> call_stack;
 public:
+bool running = false;
     uint32_t get_reg(uint8_t index);
     void set_reg(uint8_t index, uint32_t value);
 
@@ -42,6 +45,11 @@ public:
     void mems(uint8_t addr, uint8_t value);
     void memgw(uint8_t target, uint8_t addr);
     void memsw(uint8_t addr, uint8_t value);
+
+    void memgi(uint8_t target, uint8_t addr);
+    void memsi(uint8_t addr, uint8_t value);
+    void memgwi(uint8_t target, uint8_t addr);
+    void memswi(uint8_t addr, uint8_t value);
 
     void comp(uint8_t r1, uint8_t r2);
     void jump(uint32_t addr);
@@ -73,10 +81,12 @@ public:
     void shli(uint8_t target, uint8_t r1, uint32_t imm_v);
     void shri(uint8_t target, uint8_t r1, uint32_t imm_v);
 
+    void setpix(uint8_t rX, uint8_t rY, uint8_t rColor);
+
     void exec(const uint8_t instr[8]);
     void run(uint32_t start_addr = 0);
 
-    CPU(Memory *mem);
+    CPU(Memory *mem, Display *dp = nullptr);
     ~CPU() = default;
 
 };

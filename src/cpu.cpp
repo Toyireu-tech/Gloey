@@ -1,5 +1,6 @@
 #include "cpu.hpp"
 #include "cpu_def.hpp"
+#include "display.hpp"
 #include "memory.hpp"
 #include <cstdint>
 #include <cstring>
@@ -234,6 +235,12 @@ void CPU::shri(uint8_t target, uint8_t r1, uint32_t imm_v) {
     set_reg(target, a >> imm_v);
 }
 
+void CPU::setpix(uint8_t rX, uint8_t rY, uint8_t rColor) {
+    //println("const T &value");
+    display->setPixel(get_reg(rX), get_reg(rY), get_reg(rColor));
+}
+
+
 
 // [opcode] [arg 1] [arg 2] [arg 3] [imediate]
 void CPU::exec(const uint8_t instr[8]) {
@@ -356,6 +363,9 @@ void CPU::exec(const uint8_t instr[8]) {
         case OpCode::Shri:
             addi(arg1, arg2, imm_value);
             break;
+        case OpCode::Setpix:
+            setpix(arg1, arg2, arg3);
+            break;
         case OpCode::Halt:
             running = false;
             break;
@@ -378,7 +388,6 @@ void CPU::run(uint32_t start_addr) {
 }
 
 
-CPU::CPU(Memory *mem): mem(mem) {
+CPU::CPU(Memory *mem, Display *dp): mem(mem), display(dp) {
     regs[Register::FLAGS] = FlagStates::None;
-    
 }

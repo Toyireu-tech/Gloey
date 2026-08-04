@@ -60,6 +60,23 @@ inline void replace_all(std::string& str,
             pos += replacement.length();
         }
     }
+}
+
+inline void replace_all(std::string& str,
+                 const std::unordered_map<std::string, std::string>& map)
+{
+    for (const auto& [key, value] : map)
+    {
+        const std::string replacement = value;
+
+        size_t pos = 0;
+
+        while ((pos = str.find(key, pos)) != std::string::npos)
+        {
+            str.replace(pos, key.length(), replacement);
+            pos += replacement.length();
+        }
+    }
 } 
 
 inline void print_map(const std::unordered_map<std::string, uint32_t>& map)

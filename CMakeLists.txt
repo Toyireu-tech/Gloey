@@ -18,6 +18,7 @@ set(SOURCES
     src/main.cpp
     src/cpu.cpp
     src/assembler.cpp
+    src/display.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -31,4 +32,3 @@ target_link_libraries(${PROJECT_NAME} PRIVATE minifb)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
 
 set(CMAKE_CXX_FLAGS "-O3 -march=native -flto")
-#target_compile_options(${PROJECT_NAME} PRIVATE -O2 -g -fno-omit-frame-pointer)

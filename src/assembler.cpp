@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string>
 #include <sstream>
+#include <utility>
 #include <utils.h>
 #include <cstring>
 
@@ -49,6 +50,11 @@ namespace Assembler {
         return false;
     }
 
+    bool isAliasDef(const std::string& line) {
+        if (split(line, ' ')[0] == "#alias") return true;
+        return false;
+    }
+
     std::string parseLabelDef(const std::string& line) {
         return (split(line, ' ')[1]);
         
@@ -56,6 +62,13 @@ namespace Assembler {
 
     std::string parseSectionDef(const std::string& line) {
         return (split(line, ' ')[1]);
+    }
+
+    std::pair<std::string, std::string> parseAliasDef(const std::string& line) {
+        return {
+                '$' + split(line, ' ')[1],
+                split(line, ' ')[2]
+            };
     }
 
     std::vector<uint8_t> assemble(const std::string& src) {
@@ -84,6 +97,15 @@ namespace Assembler {
                 });
                 continue;
             }
+
+            if(isAliasDef(line)) {
+                //auto alias_pair = parseAliasDef(line);
+                alias.insert({
+                    parseAliasDef(line)
+                });
+                continue;
+            }
+
             pc += 8;
         } 
 
@@ -94,7 +116,8 @@ namespace Assembler {
             trim(line);
             replace_all(line, labels);
             replace_all(line, sections);
-            if (!is_valid_line(line) || isLabelDef(line) || isSectionDef(line)) continue;
+            replace_all(line, alias);
+            if (!is_valid_line(line) || isLabelDef(line) || isSectionDef(line) || isAliasDef(line)) continue;
             auto tokens = tokenize(line);
             uint8_t assembled_line[8] = {};
             if (tokens.size() <= 0) throw std::runtime_error("Invalid expression: " + line);

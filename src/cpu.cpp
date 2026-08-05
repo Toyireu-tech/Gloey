@@ -3,7 +3,7 @@
 #include "display.hpp"
 #include "memory.hpp"
 #include <cstdint>
-#include <cstring>
+#include <string>
 
 #include "debug.h"
 #include "opcode.hpp"
@@ -115,6 +115,7 @@ void CPU::memsw(uint8_t addr, uint8_t value) {
 void CPU::comp(uint8_t r1, uint8_t r2) {
     const uint32_t r1_val = get_reg(r1);
     const uint32_t r2_val = get_reg(r2);
+
 
     if (r1_val == r2_val) set_flag(FlagStates::Equal);
     else if (r1_val > r2_val) set_flag(FlagStates::Superior);

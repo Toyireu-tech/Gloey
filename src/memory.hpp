@@ -36,23 +36,23 @@ class Memory {
 
     const uint8_t* get_slice8(uint32_t offset) const
     {
-        DEBUG_CHECK(offset > size - 8, "Bad Address readed, ignored");
+        DEBUG_CHECK(offset > size - 8, "Bad Address readed (slice): " + std::to_string(offset));
         return data.data() + offset;
     }
 
     const uint8_t* get_slice4(uint32_t offset) const
     {
-        DEBUG_CHECK(offset > size - 4, "Bad Address readed, ignored");
+        DEBUG_CHECK(offset > size - 4, "Bad Address readed (slice): " + std::to_string(offset));
         return data.data() + offset;
     }
 
     void set(uint32_t addr, uint8_t value) {
-        DEBUG_CHECK(addr >= size, "Bad Address writted, ignored");
+        DEBUG_CHECK(addr >= size, "Bad Address writted: " + std::to_string(addr));
         data[addr] = value;
     }
 
     uint8_t get(uint32_t addr) {
-        DEBUG_CHECK(addr >= size, "Bad Address readed, ignored");
+        DEBUG_CHECK(addr >= size, "Bad Address readed: " + std::to_string(addr));
         return data[addr];
     }
     

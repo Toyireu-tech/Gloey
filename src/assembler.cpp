@@ -1,6 +1,8 @@
 #include "assembler.hpp"
+#include <cstddef>
 #include <cstdint>
 #include <ios>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <sstream>
@@ -53,6 +55,16 @@ namespace Assembler {
 
     bool isSectionDef(const std::string& line) {
         if (split(line, ' ')[0] == ".section") return true;
+        return false;
+    }
+
+    bool isBytesDef(const std::string& line) {
+        if (split(line, ' ')[0] == ".bytes") return true;
+        return false;
+    }
+
+    bool isIncBinDef(const std::string& line) {
+        if (split(line, ' ')[0] == ".incbin") return true;
         return false;
     }
 
@@ -117,20 +129,55 @@ namespace Assembler {
 
         
 
-        // Second iteeration, for assemble 
-        for (auto line : lines) {
+        // Second iteeration, for assemble
+        size_t lc = 0;
+        pc = 0;
+        for (auto& line : lines) {
             trim(line);
             replace_all(line, labels);
             replace_all(line, sections);
             replace_all(line, alias);
             if (!is_valid_line(line) || isLabelDef(line) || isSectionDef(line) || isAliasDef(line)) continue;
+            println(line + " pc: " + std::to_string(pc));
+
+            if (isBytesDef(line)) {
+                auto arr = split(line, ' ');
+                std::span<std::string> slice = std::span(arr).subspan(1);
+                for (auto& i : slice) {
+                    output.push_back(static_cast<uint8_t>(std::stoul(i, nullptr, 0)));
+                    pc++;
+                }
+                continue;
+            }
+
+            if (isIncBinDef(line)) {
+                auto first = line.find('"');
+                auto last  = line.rfind('"');
+
+                if (first == std::string::npos || last == std::string::npos || first == last) {
+                    throw std::runtime_error("Syntaxe invalide : incbin \"filename\"");
+                }
+
+                std::string filename = line.substr(first + 1, last - first - 1);
+
+                std::ifstream file(filename, std::ios::binary);
+                if (!file) {
+                    throw std::runtime_error("Impossible d'ouvrir le fichier : " + filename);
+                }
+
+                char byte;
+                while (file.get(byte)) {
+                    output.push_back(static_cast<uint8_t>(byte));
+                }
+            }
+
             auto tokens = tokenize(line);
             uint8_t assembled_line[8] = {};
             if (tokens.size() <= 0) throw std::runtime_error("Invalid expression: " + line);
 
             auto it = mnemonics.find(tokens[0]);
             if (it == mnemonics.end())
-                throw std::runtime_error("Unknown instruction: " + tokens[0]);
+                throw std::runtime_error("Unknown instruction at line " + std::to_string(lc) + " : " + tokens[0]);
             assembled_line[0] = it->second;
 
             int opIndex = 1;
@@ -146,6 +193,8 @@ namespace Assembler {
                 }
             }
             output.insert(output.end(), assembled_line, assembled_line + 8);
+            lc++;
+            pc+=8;
         }  
 
         return output;

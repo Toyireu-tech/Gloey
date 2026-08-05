@@ -1,26 +1,27 @@
 Just my personnal CPU emulator
 
 Calculate the 10th fib number
-jump _start
 
-.section fib
-    load r7 1
+    jump _start
 
-    .label fib_loop
+    .section fib
+        load r7 1
 
-        add r11 r6 r7
-        copy r6 r7
-        copy r7 r11
+        .label fib_loop
 
-        addi r10 r10 1
-        comp r10 r1
-        jneq fib_loop
-        
-    copy r0 r6
-    ret
+            add r11 r6 r7
+            copy r6 r7
+            copy r7 r11
 
-.label _start
-    load r1 10
-    call fib
-halt
+            addi r10 r10 1
+            comp r10 r1
+            jneq fib_loop
+            
+        copy r0 r6
+        ret
+
+    .label _start
+        load r1 10
+        call fib
+    halt
 

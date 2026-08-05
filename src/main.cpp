@@ -10,7 +10,7 @@
 
 int main(int argc, const char** argv) {
     if (argc < 2) throw std::runtime_error("Invalid command");
-    Memory mem(1024);
+    Memory mem(1024 * 1024);
     Display screen(800, 600);
     CPU cpu(&mem, &screen);
 
@@ -29,15 +29,14 @@ int main(int argc, const char** argv) {
         mem.set(p, i);
         p++;
     }
-
     
-    std::thread cpuThread([&] () {
+    std::thread cpuThread([&] () -> void {
         auto start = std::chrono::high_resolution_clock::now();
         cpu.run();
         auto end = std::chrono::high_resolution_clock::now();
 
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        std::cout << "Exécution: " << duration.count() << " ms\n";
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+        std::cout << "Exécution: " << duration.count() << " ns\n";
         std::cout << "\n" << cpu.get_reg(0);
     }); 
 

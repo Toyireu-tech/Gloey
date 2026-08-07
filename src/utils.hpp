@@ -62,6 +62,27 @@ inline void replace_all(std::string& str,
     }
 }
 
+inline void replace_allw(std::string& str,
+                          const std::unordered_map<std::string, uint32_t>& map)
+{
+    auto words = split(str, ' ');
+
+    for (auto& w : words) {
+        auto it = map.find(w);        // égalité stricte, pas de substring
+        if (it != map.end()) {
+            w = std::to_string(it->second);
+        }
+    }
+
+    // reconstruire la ligne à partir des mots modifiés
+    std::string rebuilt;
+    for (size_t i = 0; i < words.size(); ++i) {
+        if (i > 0) rebuilt += ' ';
+        rebuilt += words[i];
+    }
+    str = rebuilt;
+}
+
 inline void replace_all(std::string& str,
                  const std::unordered_map<std::string, std::string>& map)
 {
@@ -79,14 +100,58 @@ inline void replace_all(std::string& str,
     }
 } 
 
+inline void replace_allw(std::string& str,
+                          const std::unordered_map<std::string, std::string>& map)
+{
+    auto words = split(str, ' ');
+
+    for (auto& w : words) {
+        auto it = map.find(w);        // égalité stricte, pas de substring
+        if (it != map.end()) {
+            w = (it->second);
+        }
+    }
+
+    // reconstruire la ligne à partir des mots modifiés
+    std::string rebuilt;
+    for (size_t i = 0; i < words.size(); ++i) {
+        if (i > 0) rebuilt += ' ';
+        rebuilt += words[i];
+    }
+    str = rebuilt;
+}
+
 inline void print_map(const std::unordered_map<std::string, uint32_t>& map)
 {
+    std::cout << '{';
     for (const auto& [key, value] : map)
     {
         std::cout << key << " : "
                   << static_cast<int>(value)
                   << '\n';
     }
+    std::cout << "}\n";
+}
+
+inline void print_map(const std::unordered_map<std::string, std::string>& map)
+{
+    std::cout << '{';
+    for (const auto& [key, value] : map)
+    {
+        std::cout << key << " : "
+                  << value
+                  << '\n';
+    }
+    std::cout << "}\n";
+}
+
+inline std::string join(const std::vector<std::string>& words, char sep) {
+    std::string result;
+    for (size_t i = 0; i < words.size(); ++i) {
+        if (i > 0) result += sep;
+        result += words[i];
+    }
+    return result;
 }
 
 inline void trim(std::string& str)

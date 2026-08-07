@@ -12,6 +12,7 @@ namespace Assembler {
     static std::unordered_map<std::string, uint32_t> labels;
     static std::unordered_map<std::string, uint32_t> sections;
     static std::unordered_map<std::string, std::string> alias;
+    static std::vector<std::string> module_stack;
 
     static const std::unordered_map<std::string, uint8_t> mnemonics = {
     {"nop",      OpCode::Nop},

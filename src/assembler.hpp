@@ -75,6 +75,8 @@ namespace Assembler {
     {"callreg",  OpCode::CallReg},
     {"ret",      OpCode::Ret},
     {"setpix",   OpCode::Setpix},
+    {"push",   OpCode::Push},
+    {"pop",   OpCode::Pop},
 
     {"halt",     OpCode::Halt},
 };

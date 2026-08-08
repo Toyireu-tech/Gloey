@@ -14,6 +14,7 @@ private:
     Display *display;
     
     std::stack<uint32_t> call_stack;
+    std::vector<std::array<uint32_t, 15>> data_stack;
 public:
 bool running = false;
     uint32_t get_reg(uint8_t index);
@@ -82,6 +83,9 @@ bool running = false;
     void shri(uint8_t target, uint8_t r1, uint32_t imm_v);
 
     void setpix(uint8_t rX, uint8_t rY, uint8_t rColor);
+
+    void push();
+    void pop();
 
     void exec(const uint8_t instr[8]);
     void run(uint32_t start_addr = 0);

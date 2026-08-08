@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -167,4 +168,48 @@ inline void trim(std::string& str)
         --end;
 
     str = str.substr(start, end - start);
+}
+
+inline uint32_t eval(const std::string& expr) {
+    uint32_t result = 0;
+    uint32_t term = 0;
+    uint32_t number = 0;
+    char op = '+';
+
+    for (size_t i = 0; i <= expr.size(); ++i) {
+        char c = i < expr.size() ? expr[i] : '+';
+
+        if (std::isdigit(c)) {
+            number = number * 10 + (c - '0');
+            continue;
+        }
+
+        if (c == ' ')
+            continue;
+
+        switch (op) {
+            case '+':
+                result += term;
+                term = number;
+                break;
+
+            case '-':
+                result += term;
+                term = -number;
+                break;
+
+            case '*':
+                term *= number;
+                break;
+        }
+
+        number = 0;
+        op = c;
+    }
+
+    return result + term;
+}
+
+inline std::string eval_str(const std::string& expr) {
+    return std::to_string(eval(expr));
 }

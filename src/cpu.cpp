@@ -3,7 +3,7 @@
 #include "display.hpp"
 #include "memory.hpp"
 #include <cstdint>
-#include <string>
+#include <span>
 
 #include "debug.h"
 #include "opcode.hpp"
@@ -241,6 +241,31 @@ void CPU::setpix(uint8_t rX, uint8_t rY, uint8_t rColor) {
     display->setPixel(get_reg(rX), get_reg(rY), get_reg(rColor));
 }
 
+void CPU::push() {
+    std::array<uint32_t, 15> state;
+
+    std::copy(
+        regs + 1,
+        regs + 16,
+        state.begin()
+    );
+
+    data_stack.push_back(state);
+}
+
+void CPU::pop() {
+    DEBUG_CHECK(data_stack.empty(), "Can't pop an empty data stack");
+
+    auto& state = data_stack.back();
+
+    std::copy(
+        state.begin(),
+        state.end(),
+        regs + 1
+    );
+
+    data_stack.pop_back();
+}
 
 
 // [opcode] [arg 1] [arg 2] [arg 3] [imediate]
@@ -366,6 +391,12 @@ void CPU::exec(const uint8_t instr[8]) {
             break;
         case OpCode::Setpix:
             setpix(arg1, arg2, arg3);
+            break;
+        case OpCode::Push:
+            push();
+            break;
+        case OpCode::Pop:
+            pop();
             break;
         case OpCode::Halt:
             running = false;

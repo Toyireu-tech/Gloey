@@ -64,7 +64,10 @@ enum OpCode: std::uint8_t {
     Memgwi = 0x2B,
     Memswi = 0x2C,
 
-    Setpix = 0x2E,
+    Setpix = 0x2D,
 
-    Halt = 0xFF,
+    Push = 0x2E,
+    Pop = 0x2F,
+
+    Halt = 0xFF
 };

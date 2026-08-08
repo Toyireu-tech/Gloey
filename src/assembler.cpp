@@ -86,11 +86,12 @@ namespace Assembler {
     }
 
     bool isLabelDef(const std::string& line) {return (split(line, ' ')[0] == ".label"); }
-
     bool isSectionDef(const std::string& line) {return split(line, ' ')[0] == ".section"; }
     bool isBytesDef(const std::string& line) {return split(line, ' ')[0] == ".bytes"; }
     bool isIncBinDef(const std::string& line) { return split(line, ' ')[0] == ".incbin"; }
     bool isWordDef(const std::string& line) {return split(line, ' ')[0] == ".word"; }
+    bool isReserveDef(const std::string& line) {return split(line, ' ')[0] == ".reserve"; }
+    bool isStringDef(const std::string& line) {return split(line, ' ')[0] == ".string"; }
     bool isAliasDef(const std::string& line) {return split(line, ' ')[0] == "#alias"; }
     bool isModDef(const std::string& line) { return split(line, ' ')[0] == "#defmod"; }
     bool isEndMod(const std::string& line) { return split(line, ' ')[0] == "#endmod"; }
@@ -154,6 +155,25 @@ namespace Assembler {
                 pc += std::filesystem::file_size(filename);
                 continue;
             }
+            
+            if (isReserveDef(line)) {
+                auto size = std::stoul(split(line, ' ')[1], nullptr, 0);
+                pc += size;
+                continue;
+            }
+
+
+            if (isStringDef(line)) {
+                auto first = line.find('"');
+                auto last  = line.rfind('"');
+
+                if (first == std::string::npos || last == std::string::npos || first == last) {
+                    throw std::runtime_error("Invalid syntax : .string \"str\"");
+                }
+                std::string str = line.substr(first + 1, last - first - 1);
+                pc += str.size() + 1;
+                continue;
+            }
 
             pc += 8;
         } 
@@ -187,8 +207,8 @@ namespace Assembler {
                 isAliasDef(line) || isModDef(line) || isEndMod(line))
                 continue;
 
-            println(line + " pc: " + std::to_string(pc));
-            print_map(alias);
+            
+            //print_map(alias);
 
             if (isBytesDef(line)) {
                 auto arr = split(line, ' ');
@@ -199,6 +219,8 @@ namespace Assembler {
                 }
                 continue;
             }
+
+                        println(line + " pc: " + std::to_string(pc));
 
             if (isWordDef(line)) {
                 auto arr = split(line, ' ');
@@ -233,6 +255,40 @@ namespace Assembler {
                 }
                 continue;
             }
+
+
+
+            if (isReserveDef(line)) {
+                auto size = std::stoul(split(line, ' ')[1], nullptr, 0);
+                for (uint32_t i = 0; i < size; i++) {
+                    output.push_back(0);
+                }
+                pc += size;
+                continue;
+            }
+
+            
+
+            if (isStringDef(line)) {
+                auto first = line.find('"');
+                auto last  = line.rfind('"');
+
+                if (first == std::string::npos || last == std::string::npos || first == last) {
+                    throw std::runtime_error("Invalid syntax : .string \"str\"");
+                }
+
+                std::string str = line.substr(first + 1, last - first - 1);
+                //println("ff : " + str);
+                for (char c : str)
+                    output.push_back(static_cast<uint8_t>(c));
+
+                output.push_back(0);
+                pc += str.size() + 1;
+                continue;
+            }
+
+
+
 
             auto tokens = tokenize(line);
             uint8_t assembled_line[8] = {};

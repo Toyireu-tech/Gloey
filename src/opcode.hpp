@@ -69,5 +69,8 @@ enum OpCode: std::uint8_t {
     Push = 0x2E,
     Pop = 0x2F,
 
+    In = 0x30,
+    Out = 0x31,
+
     Halt = 0xFF
 };

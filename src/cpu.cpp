@@ -2,12 +2,17 @@
 #include "cpu_def.hpp"
 #include "display.hpp"
 #include "memory.hpp"
+#include <chrono>
 #include <cstdint>
-#include <span>
+#include <stdexcept>
+#include <string>
 
 #include "debug.h"
 #include "opcode.hpp"
 #include "utils.hpp"
+
+
+
 
 uint32_t CPU::get_reg(uint8_t index) {
     DEBUG_CHECK(index >= REGISTER_COUNT, "Bad register get");
@@ -267,6 +272,25 @@ void CPU::pop() {
     data_stack.pop_back();
 }
 
+void CPU::in(uint8_t r1, uint32_t port) {
+    if (port >= 64) throw std::runtime_error("dih " + std::to_string(port));
+    if (port == 0) {
+        g_last_ascii_code = static_cast<uint8_t>(get_reg(r1));  // ré-arme g_last_ascii_code lui-même
+    }
+    
+    io_ports[port] = get_reg(r1);
+}
+
+void CPU::out(uint8_t target, uint32_t port) {
+    if (port == 0) io_ports[0] = g_last_ascii_code;
+    if (port == 1) {
+        auto curr_time = getTicksMs();
+        io_ports[1] = curr_time - clock_begin;
+    }
+    set_reg(target, io_ports[port]);
+    
+}
+
 
 // [opcode] [arg 1] [arg 2] [arg 3] [imediate]
 void CPU::exec(const uint8_t instr[8]) {
@@ -398,6 +422,12 @@ void CPU::exec(const uint8_t instr[8]) {
         case OpCode::Pop:
             pop();
             break;
+        case OpCode::In:
+            in(arg1, imm_value);
+            break;
+        case OpCode::Out:
+            out(arg1, imm_value);
+            break;
         case OpCode::Halt:
             running = false;
             break;
@@ -407,15 +437,38 @@ void CPU::exec(const uint8_t instr[8]) {
     return;
 }
 
+#include <thread>
+#include <chrono>
+
 void CPU::run(uint32_t start_addr) {
+    clock_begin = getTicksMs();
     running = true;
     set_pc(start_addr);
+
+    // Paramètres de fréquence
+    constexpr uint32_t TARGET_HZ = 200'000'000; // 20 MHz
+    constexpr uint32_t BATCH_SIZE = 2'000;     
+    constexpr uint64_t TARGET_BATCH_MS = (BATCH_SIZE * 1000) / TARGET_HZ; 
+
+    uint32_t inst_count = 0;
+    uint64_t batch_start = getTicksMs();
 
     while (running && get_pc() < mem->get_size()) {
         const uint8_t* code = mem->get_slice8(get_pc());
         exec(code);
-
         regs[Register::PC] += 8;
+
+        // Bridage du processeur
+        if (++inst_count >= BATCH_SIZE) {
+            uint64_t elapsed = getTicksMs() - batch_start;
+            
+            if (elapsed < TARGET_BATCH_MS) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(TARGET_BATCH_MS - elapsed));
+            }
+
+            inst_count = 0;
+            batch_start = getTicksMs();
+        }
     }
 }
 

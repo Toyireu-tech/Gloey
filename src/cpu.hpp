@@ -6,6 +6,21 @@
 #include <stack>
 #include <sys/types.h>
 #include "display.hpp"
+#include <chrono>
+
+inline uint32_t getTicksMs() {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()
+    ).count();
+}
+
+inline uint32_t g_last_ascii_code = 0;
+
+
+// Callback appelée à chaque saisie de caractère
+inline void char_input_callback(struct mfb_window *window, unsigned int code_point) {
+    g_last_ascii_code = code_point;
+}
 
 class CPU {
 private:
@@ -15,8 +30,11 @@ private:
     
     std::stack<uint32_t> call_stack;
     std::vector<std::array<uint32_t, 15>> data_stack;
+    uint32_t io_ports[64] = {0}; // 0: keyboard   1: clock
+    uint32_t clock_begin = getTicksMs();
+    
 public:
-bool running = false;
+    bool running = false;
     uint32_t get_reg(uint8_t index);
     void set_reg(uint8_t index, uint32_t value);
 
@@ -86,6 +104,9 @@ bool running = false;
 
     void push();
     void pop();
+
+    void in(uint8_t r1,uint32_t port);
+    void out(uint8_t target, uint32_t port);
 
     void exec(const uint8_t instr[8]);
     void run(uint32_t start_addr = 0);

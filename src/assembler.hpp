@@ -77,6 +77,8 @@ namespace Assembler {
     {"setpix",   OpCode::Setpix},
     {"push",   OpCode::Push},
     {"pop",   OpCode::Pop},
+    {"in",   OpCode::In},
+    {"out",   OpCode::Out},
 
     {"halt",     OpCode::Halt},
 };

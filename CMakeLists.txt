@@ -14,6 +14,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(minifb)
 
+find_package(ZLIB REQUIRED)
+
 set(SOURCES
     src/main.cpp
     src/cpu.cpp
@@ -29,6 +31,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE minifb)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+target_link_libraries(${PROJECT_NAME} PRIVATE ZLIB::ZLIB)
 
 # ====== GASM ========
 
@@ -45,6 +48,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 
 target_compile_options(gasm PRIVATE -Wall -Wextra)
-
+target_link_libraries(gasm PRIVATE ZLIB::ZLIB)
 
 set(CMAKE_CXX_FLAGS "-O3 -march=native -flto")

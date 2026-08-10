@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <string>
 #include <sstream>
+#include <unordered_map>
 #include <utility>
 #include "utils.hpp"
 #include <cstring>
@@ -16,6 +17,8 @@
 using std::ios; 
 
 namespace Assembler {
+
+    
 
     template<typename T>
     std::string resolve(const std::string& token,
@@ -95,6 +98,7 @@ namespace Assembler {
     bool isAliasDef(const std::string& line) {return split(line, ' ')[0] == "#alias"; }
     bool isModDef(const std::string& line) { return split(line, ' ')[0] == "#defmod"; }
     bool isEndMod(const std::string& line) { return split(line, ' ')[0] == "#endmod"; }
+    bool isInclude(const std::string& line) { return split(line, ' ')[0] == "#include"; }
 
     std::string parseLabelDef(const std::string& line) {
         return make_key(split(line, ' ')[1]);
@@ -112,9 +116,54 @@ namespace Assembler {
             };
     }
 
-    std::vector<uint8_t> assemble(const std::string& src) {
+    std::vector<std::string> preprocessIncludes(const std::vector<std::string>& input_lines) {
+        std::vector<std::string> expanded_lines;
+
+        for (auto line : input_lines) {
+            // On vérifie si la ligne contient un #include
+            trim(line);
+            if (isInclude(line)) {
+                auto first = line.find('"');
+                auto last  = line.rfind('"');
+
+                if (first == std::string::npos || last == std::string::npos || first == last) {
+                    throw std::runtime_error("Invalid syntax : #include \"filename\"");
+                }
+
+                // Extraction du nom du fichier
+                std::string filename = line.substr(first + 1, last - first - 1);
+
+                // Ouverture du fichier inclus
+                std::ifstream file(filename);
+                if (!file) {
+                    throw std::runtime_error("Could not open included file : " + filename);
+                }
+
+                // Lecture des lignes du fichier inclus
+                std::vector<std::string> included_file_lines;
+                std::string file_line;
+                while (std::getline(file, file_line)) {
+                    included_file_lines.push_back(file_line);
+                }
+
+                // Appel récursif pour gérer les #include imbriqués dans ce fichier
+                auto expanded_file = preprocessIncludes(included_file_lines);
+
+                // Inserer toutes les lignes lues à la place de la ligne #include
+                expanded_lines.insert(expanded_lines.end(), expanded_file.begin(), expanded_file.end());
+            } else {
+                // Ligne normale : on la conserve telle quelle
+                expanded_lines.push_back(line);
+            }
+        }
+
+        return expanded_lines;
+    }
+
+    std::vector<uint8_t> assemble(std::string& src) {
         std::vector<uint8_t> output;
         auto lines = split(src, '\n');
+        lines = preprocessIncludes(lines);
 
         uint32_t pc = 0;
 
@@ -153,6 +202,11 @@ namespace Assembler {
                     throw std::runtime_error("Could not open file named : " + filename);
                 }
                 pc += std::filesystem::file_size(filename);
+
+                // Padding
+                if (pc % 2 != 0) {
+                    pc++;
+                }
                 continue;
             }
             
@@ -171,7 +225,16 @@ namespace Assembler {
                     throw std::runtime_error("Invalid syntax : .string \"str\"");
                 }
                 std::string str = line.substr(first + 1, last - first - 1);
-                pc += str.size() + 1;
+                std::unordered_map<std::string, std::string> mapp({
+                    {"\\n", "\n"}
+                });
+                replace_all(str, mapp);
+                pc += str.size() + 1; 
+                continue;
+            }
+
+            if (isWordDef(line)) {
+                pc += 4;
                 continue;
             }
 
@@ -181,6 +244,8 @@ namespace Assembler {
         
 
         
+
+
 
         // Second iteeration, for assemble
         size_t lc = 0;
@@ -229,7 +294,6 @@ namespace Assembler {
                 u32_to_little_endian( static_cast<uint32_t>(std::stoul(slice[0], nullptr, 0)), imm_arr.data());
                 output.insert(output.end(), imm_arr.begin(), imm_arr.end());
                 pc += 4;
-                
                 continue;
             }
 
@@ -251,6 +315,11 @@ namespace Assembler {
                 char byte;
                 while (file.get(byte)) {
                     output.push_back(static_cast<uint8_t>(byte));
+                    pc++;
+                }
+
+                if (pc % 2 != 0) {
+                    output.push_back(0x00); // On insère 1 octet NUL de bourrage dans le binaire
                     pc++;
                 }
                 continue;
@@ -276,9 +345,15 @@ namespace Assembler {
                 if (first == std::string::npos || last == std::string::npos || first == last) {
                     throw std::runtime_error("Invalid syntax : .string \"str\"");
                 }
+                
 
                 std::string str = line.substr(first + 1, last - first - 1);
                 //println("ff : " + str);
+                std::unordered_map<std::string, std::string> mapp({
+                    {"\\n", "\n"}
+                });
+                
+                replace_all(str, mapp);
                 for (char c : str)
                     output.push_back(static_cast<uint8_t>(c));
 
@@ -335,12 +410,13 @@ namespace Assembler {
         }
 
         output = assemble(input);
+        compressToGz(output, output_name);
 
-        if (output_file.is_open()) {
-            output_file.write(reinterpret_cast<const char*>(output.data()), output.size());
-        } else {
-            throw std::runtime_error("Counld not open file named \"" + output_name + "\"");
-        }
+        // if (output_file.is_open()) {
+        //     output_file.write(reinterpret_cast<const char*>(output.data()), output.size());
+        // } else {
+        //     throw std::runtime_error("Counld not open file named \"" + output_name + "\"");
+        // }
 
         input_file.close();
         output_file.close(); 

@@ -101,6 +101,8 @@ inline void replace_all(std::string& str,
     }
 } 
 
+
+
 inline void replace_allw(std::string& str,
                           const std::unordered_map<std::string, std::string>& map)
 {
@@ -212,4 +214,41 @@ inline uint32_t eval(const std::string& expr) {
 
 inline std::string eval_str(const std::string& expr) {
     return std::to_string(eval(expr));
+}
+
+#include <zlib.h>
+
+
+inline bool compressToGz(const std::vector<uint8_t>& data, const std::string& outputFilename) {
+    if (data.empty()) {
+        std::cerr << "[GZ Error] Le buffer binaire est vide." << std::endl;
+        return false;
+    }
+
+    gzFile file = gzopen(outputFilename.c_str(), "wb1");
+    if (!file) {
+        std::cerr << "[GZ Error] Impossible de créer le fichier : " << outputFilename << std::endl;
+        return false;
+    }
+
+    int bytesWritten = gzwrite(file, data.data(), static_cast<unsigned int>(data.size()));
+    gzclose(file);
+
+    return bytesWritten == static_cast<int>(data.size());
+}
+
+// Décompression rapide d'un fichier .gz vers le buffer mémoire
+inline bool decompressFromGz(const std::string& gzFilename, std::vector<uint8_t>& outData) {
+    gzFile file = gzopen(gzFilename.c_str(), "rb");
+    if (!file) return false;
+
+    char buffer[16384]; // Buffer de 16 KB pour une lecture rapide
+    int bytesRead = 0;
+
+    while ((bytesRead = gzread(file, buffer, sizeof(buffer))) > 0) {
+        outData.insert(outData.end(), buffer, buffer + bytesRead);
+    }
+
+    gzclose(file);
+    return true;
 }
